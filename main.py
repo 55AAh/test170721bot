@@ -4,7 +4,7 @@ import socket
 
 def main():
     print(os.environ)
-    HOST = "127.0.0.1"
+    HOST = "0.0.0.0"
     PORT = int(os.getenv("PORT", 80))
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.bind((HOST, PORT))
