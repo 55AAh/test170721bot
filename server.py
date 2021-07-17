@@ -8,7 +8,7 @@ import json
 class Server:
     LISTEN_CONN = 10
     BUFSIZE = 10
-    TIMEOUT = 30
+    TIMEOUT = 1
 
     def __init__(self, host, port):
         self.host, self.port = host, port
