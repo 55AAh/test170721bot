@@ -14,7 +14,7 @@ def main():
         (client_sock, address) = sock.accept()
         print(f"\tCONNECTION: {address}")
         data = client_sock.recv(10240)
-        data = data.decode("utf-8")
+        #data = data.decode("utf-8")
         print(f"\tRECEIVED:\n{data}")
         from time import sleep
         sleep(1)
