@@ -8,7 +8,7 @@ def main():
     PORT = int(os.getenv("PORT", 80))
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.bind((HOST, PORT))
-    print("LISTENING")
+    print(f"LISTENING ON {HOST}:{PORT}")
     sock.listen(10)
     while True:
         (client_sock, address) = sock.accept()
