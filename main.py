@@ -1,9 +1,11 @@
+import os
 import socket
 
 
 def main():
+    PORT = os.getenv("PORT", 80)
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.bind(("127.0.0.1", 80))
+    sock.bind(("127.0.0.1", PORT))
     print("LISTENING")
     sock.listen(10)
     while True:
