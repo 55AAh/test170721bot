@@ -12,15 +12,15 @@ def main():
     sock.listen(10)
     while True:
         (client_sock, address) = sock.accept()
-        print(f"CONNECTION: {address}")
+        print(f"\tCONNECTION: {address}")
         data = client_sock.recv(10240)
         data = data.decode("utf-8")
-        response = "HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n"
-        response = response.encode("utf-8")
-        client_sock.send(response)
-        client_sock.close()
-        print(f"RECEIVED:\n{data}")
-        print(f"CLIENT SERVED")
+        print(f"\tRECEIVED:\n{data}")
+        #response = "HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n"
+        #response = response.encode("utf-8")
+        #client_sock.send(response)
+        #client_sock.close()
+        print(f"\tCLIENT SERVED")
 
 
 if __name__ == '__main__':
