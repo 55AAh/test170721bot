@@ -16,10 +16,13 @@ def main():
         data = client_sock.recv(10240)
         data = data.decode("utf-8")
         print(f"\tRECEIVED:\n{data}")
-        #response = "HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n"
-        #response = response.encode("utf-8")
-        #client_sock.send(response)
-        #client_sock.close()
+        from time import sleep
+        sleep(1)
+        response = "HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n"
+        response = response.encode("utf-8")
+        client_sock.send(response)
+        sleep(1)
+        client_sock.close()
         print(f"\tCLIENT SERVED")
 
 
