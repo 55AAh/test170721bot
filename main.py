@@ -15,6 +15,10 @@ def main():
         print(f"CONNECTION: {address}")
         data = client_sock.recv(10240)
         data = data.decode("utf-8")
+        response = "HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n"
+        response = response.encode("utf-8")
+        client_sock.send(response)
+        client_sock.close()
         print(f"RECEIVED:\n{data}")
         print(f"CLIENT SERVED")
 
