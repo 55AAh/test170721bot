@@ -16,7 +16,8 @@ def main():
         data = client_sock.recv(10000)
         #data = data.decode("utf-8")
         print(f"\tRECEIVED:\n{data}")
-        if "\r\n\r\n" not in data.decode("utf-8"):
+        s = data.decode("utf-8").split("\r\n\r\n")
+        if len(s) == 2 and len(s[1]) == 0:
             print("\tNOT FOUND DATA")
             from time import sleep
             sleep(1)
