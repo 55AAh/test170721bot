@@ -20,7 +20,7 @@ def main():
             print("\tNOT FOUND DATA")
             from time import sleep
             sleep(1)
-            data = client_sock.recv()
+            data = client_sock.recv(10000)
             # data = data.decode("utf-8")
             print(f"\tRECEIVED ADDITIONAL:\n{data}")
         print("\tFOUND DATA")
