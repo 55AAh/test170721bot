@@ -35,7 +35,7 @@ class HttpHandler:
 
         headers = dict()
         for line in lines:
-            name, value = line.split(":")
+            name, value = line.split(":", 1)
             value = value.lstrip().rstrip('\r')
             headers.setdefault(name, []). append(value)
 
