@@ -41,6 +41,7 @@ def main():
         i = 0
         while i < 10:
             log(INFO, "\tSELF_NOTIFY "+str(i))
+            i += 1
             sleep(1)
         h[0].shutdown()
         s[0]=True
