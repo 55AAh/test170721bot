@@ -26,17 +26,17 @@ def main():
     def sss(signum, frame):
         print(signum, frame)
         requests.get("https://test170721.herokuapp.com/notify")
-        sleep(20)
+        # sleep(20)
         h[0].shutdown()
         s[0]=True
     signal.signal(signal.SIGTERM, sss)
     log(ERROR, "\tSTART")
     # sleep(20 * 60)
-    log(ERROR, "\tNTF1")
-    requests.get("https://test170721.herokuapp.com/notify")
+    # log(ERROR, "\tNTF1")
+    # requests.get("https://test170721.herokuapp.com/notify")
     # sleep(20 * 60)
-    log(ERROR, "\tNTF2")
-    requests.get("https://test170721.herokuapp.com/notify")
+    # log(ERROR, "\tNTF2")
+    # requests.get("https://test170721.herokuapp.com/notify")
     i=0
     while not s[0]:
         if i % 1 == 0:
