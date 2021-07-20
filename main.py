@@ -2,7 +2,7 @@ from threading import Thread
 from time import sleep
 import requests
 import os
-from logging import log, ERROR
+from logging import log, ERROR, INFO
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import signal
 from logger import Logger
@@ -20,7 +20,12 @@ def t():
 
 def main():
     Logger("log.txt")
-    log(ERROR, "\tSTARTING")
+    log(INFO, "\tACQUIRING LOCK")
+    while os.path.isfile("lock"):
+        sleep(1)
+    with open("lock", "w") as f:
+        pass
+    log(INFO, "\tLOCK ACQUIRED, STARTING")
     th=Thread(target=t,args=())
     th.start()
     def sss(signum, frame):
@@ -51,6 +56,7 @@ def main():
         i += 1
         sleep(1)
     log(ERROR, "DATA SAVED, EXITING")
+    os.remove("lock")
     return
 
 if __name__ == '__main__':
