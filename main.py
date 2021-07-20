@@ -5,6 +5,7 @@ import os
 from logging import log, ERROR
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import signal
+from logger import Logger
 
 h=[None]
 s=[False]
