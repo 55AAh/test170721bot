@@ -36,7 +36,7 @@ def main():
     log(ERROR, "\tNTF2")
     requests.get("https://test170721.herokuapp.com/notify")
     i=0
-    while not s[0]:
+    while not s[0] and i < 30:
         if i % 1 == 0:
             log(ERROR, i)
         i+=1
