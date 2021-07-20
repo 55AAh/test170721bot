@@ -31,6 +31,7 @@ def main():
             break
         sleep(1)
     db_curr.execute("INSERT INTO lock VALUES (CURRENT_DATE)")
+    db_conn.commit()
     log(INFO, "\tLOCK ACQUIRED, STARTING")
     th=Thread(target=t,args=())
     th.start()
@@ -63,6 +64,7 @@ def main():
         sleep(1)
     log(INFO, "DATA SAVED, EXITING")
     db_curr.execute("DELETE FROM lock")
+    db_conn.commit()
     return
 
 if __name__ == '__main__':
