@@ -1,4 +1,5 @@
 from threading import Thread
+from multiprocessing import Process, Event
 from time import sleep
 import requests
 import os
@@ -11,7 +12,7 @@ import psycopg2
 h=[None]
 s=[False]
 
-def t():
+def p():
     def run(server_class=HTTPServer, handler_class=BaseHTTPRequestHandler):
         server_address = ('0.0.0.0', int(os.getenv("PORT", 80)))
         httpd = server_class(server_address, handler_class)
@@ -33,8 +34,8 @@ def main():
     db_curr.execute("INSERT INTO lock VALUES (CURRENT_DATE)")
     db_conn.commit()
     log(INFO, "\tLOCK ACQUIRED, STARTING")
-    th=Thread(target=t,args=())
-    th.start()
+    pr=Process(target=p,args=())
+    pr.start()
     def sss(signum, frame):
         print(signum, frame)
         requests.get("https://test170721.herokuapp.com/notify")
@@ -43,7 +44,7 @@ def main():
             log(INFO, "\tSELF_NOTIFY "+str(i))
             i += 1
             sleep(1)
-        h[0].shutdown()
+        # h[0].shutdown()
         s[0]=True
     signal.signal(signal.SIGTERM, sss)
     log(INFO, "\tSTART")
