@@ -25,6 +25,8 @@ def main():
     th.start()
     def sss(signum, frame):
         print(signum, frame)
+        requests.get("https://test170721.herokuapp.com/notify")
+        sleep(20)
         h[0].shutdown()
         s[0]=True
     signal.signal(signal.SIGTERM, sss)
@@ -36,7 +38,7 @@ def main():
     log(ERROR, "\tNTF2")
     requests.get("https://test170721.herokuapp.com/notify")
     i=0
-    while not s[0] and i < 30:
+    while not s[0]:
         if i % 1 == 0:
             log(ERROR, i)
         i+=1
@@ -44,8 +46,8 @@ def main():
     th.join()
     log(ERROR, "\tSAVING DATA")
     i=0
-    while i < 3:
-        log(ERROR, i)
+    while i < 2:
+        log(ERROR, "\tSAVING DATA "+str(i))
         i += 1
         sleep(1)
     log(ERROR, "DATA SAVED, EXITING")
