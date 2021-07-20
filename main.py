@@ -6,6 +6,7 @@ from logging import log, ERROR, INFO
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import signal
 from logger import Logger
+import psycopg2
 
 h=[None]
 s=[False]
