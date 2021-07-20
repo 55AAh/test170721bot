@@ -58,7 +58,7 @@ def main():
     th.join()
     log(INFO, "\tSAVING DATA")
     i=0
-    while i < 2:
+    while i < 10:
         log(INFO, "\tSAVING DATA "+str(i))
         i += 1
         sleep(1)
