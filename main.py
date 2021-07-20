@@ -44,10 +44,11 @@ def main():
     th.join()
     log(ERROR, "\tSAVING DATA")
     i=0
-    while i < 60*60:
+    while i < 20:
         log(ERROR, i)
         i += 1
         sleep(1)
+    log(ERROR, "DATA SAVED, EXITING")
     return
 
 if __name__ == '__main__':
