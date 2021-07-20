@@ -44,7 +44,7 @@ def main():
     th.join()
     log(ERROR, "\tSAVING DATA")
     i=0
-    while i < 20:
+    while i < 3:
         log(ERROR, i)
         i += 1
         sleep(1)
