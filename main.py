@@ -37,8 +37,11 @@ def main():
     th.start()
     def sss(signum, frame):
         print(signum, frame)
-        # requests.get("https://test170721.herokuapp.com/notify")
-        # sleep(20)
+        requests.get("https://test170721.herokuapp.com/notify")
+        i = 0
+        while i < 10:
+            log(INFO, "\tSELF_NOTIFY "+str(i))
+            sleep(1)
         h[0].shutdown()
         s[0]=True
     signal.signal(signal.SIGTERM, sss)
