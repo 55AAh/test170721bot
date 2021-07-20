@@ -21,10 +21,15 @@ def t():
 def main():
     Logger("log.txt")
     log(INFO, "\tACQUIRING LOCK")
-    while os.path.isfile("lock"):
+    DATABASE_URL = os.environ['DATABASE_URL']
+    db_conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    db_curr = db_conn.cursor()
+    while True:
+        db_curr.execute("SELECT * FROM lock")
+        if len(db_curr.fetchall()) == 0:
+            break
         sleep(1)
-    with open("lock", "w") as f:
-        pass
+    db_curr.execute("INSERT INTO lock VALUES (CURRENT_DATE)")
     log(INFO, "\tLOCK ACQUIRED, STARTING")
     th=Thread(target=t,args=())
     th.start()
@@ -35,28 +40,28 @@ def main():
         h[0].shutdown()
         s[0]=True
     signal.signal(signal.SIGTERM, sss)
-    log(ERROR, "\tSTART")
+    log(INFO, "\tSTART")
     # sleep(20 * 60)
-    # log(ERROR, "\tNTF1")
+    # log(INFO, "\tNTF1")
     # requests.get("https://test170721.herokuapp.com/notify")
     # sleep(20 * 60)
-    # log(ERROR, "\tNTF2")
+    # log(INFO, "\tNTF2")
     # requests.get("https://test170721.herokuapp.com/notify")
     i=0
     while not s[0]:
         if i % 1 == 0:
-            log(ERROR, i)
+            log(INFO, i)
         i+=1
         sleep(1)
     th.join()
-    log(ERROR, "\tSAVING DATA")
+    log(INFO, "\tSAVING DATA")
     i=0
     while i < 2:
-        log(ERROR, "\tSAVING DATA "+str(i))
+        log(INFO, "\tSAVING DATA "+str(i))
         i += 1
         sleep(1)
-    log(ERROR, "DATA SAVED, EXITING")
-    os.remove("lock")
+    log(INFO, "DATA SAVED, EXITING")
+    db_curr.execute("DELETE FROM lock")
     return
 
 if __name__ == '__main__':
