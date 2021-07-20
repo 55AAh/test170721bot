@@ -37,7 +37,7 @@ def main():
     th.start()
     def sss(signum, frame):
         print(signum, frame)
-        requests.get("https://test170721.herokuapp.com/notify")
+        # requests.get("https://test170721.herokuapp.com/notify")
         # sleep(20)
         h[0].shutdown()
         s[0]=True
