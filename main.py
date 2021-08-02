@@ -43,6 +43,7 @@ def main():
 	httpd = HTTPServer((HOST, PORT), SimpleHTTPRequestHandler)
 	Thread(target=stopper, args=(event, httpd)).start()
 	httpd.serve_forever()
+	print("EXITING")
 	for p in processes:
 		p.kill()
 	print("EXITED")
