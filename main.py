@@ -102,6 +102,9 @@ def stopper(event):
 	log("GOT EVENT")
 	h[0].shutdown()
 	log("STOPPED httpd")
+	while True:
+		log("STOPPER")
+		sleep(1)
 	
 
 if __name__ == '__main__':
