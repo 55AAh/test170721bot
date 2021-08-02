@@ -52,4 +52,6 @@ def main():
 if __name__ == '__main__':
 	multiprocessing.set_start_method("spawn")
 	print(f"START METHOD = {multiprocessing.get_start_method()}")
-	main()
+	Process(target=main).start()
+	sleep(90)
+	print("ME")
