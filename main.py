@@ -6,6 +6,8 @@ from time import sleep
 import os
 import socket
 from http.server import HTTPServer, SimpleHTTPRequestHandler
+import selectors
+print("SEL:",hasattr(selectors, 'PollSelector'))
 
 
 ll = [0]
