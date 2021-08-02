@@ -4,6 +4,7 @@ from signal import signal, SIGTERM
 from time import sleep
 import os
 import socket
+from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 
 def rs(n):
@@ -26,13 +27,10 @@ def main():
 	rs("Main")
 	HOST = "0.0.0.0"
 	PORT = int(os.getenv("PORT", 80))
-	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	sock.bind((HOST, PORT))
+	httpd = HTTPServer((HOST, PORT), SimpleHTTPRequestHandler)
 	Process(target=ctr, daemon=True).start()
-	sock.listen()
-	print(f"LISTENING ON {HOST}:{PORT}")
-	sock.accept()
-
+	httpd.serve_forever()
+	
 
 def pt(i):
 	rs(str(i))
