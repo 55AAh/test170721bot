@@ -12,7 +12,6 @@ def reg_signal(name, event):
 	def callback(*args, **kwargs):
 		print(f"Caught SIGTERM in {name}: {args}, {kwargs}")
 		if event:
-			sleep(5)
 			event.set()
 	signal(SIGTERM, callback)
 	
@@ -34,7 +33,7 @@ def stopper(event, httpd):
 def main():
 	event=Event()
 	processes = []
-	for i in range(5):
+	for i in range(3):
 		p = Process(target=counter, args=("Process " + str(i + 1), None), daemon=True)
 		processes.append(p)
 		p.start()
