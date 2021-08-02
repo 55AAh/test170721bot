@@ -7,8 +7,8 @@ import socket
 
 
 def rs(n):
-	def sc():
-		print(f"Caught SIGTERM in {n}")
+	def sc(*args, **kwargs):
+		print(f"Caught SIGTERM in {n}: {args}, {kwargs}")
 	signal(SIGTERM, sc)
 	
 
