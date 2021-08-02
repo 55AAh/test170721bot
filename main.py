@@ -7,9 +7,13 @@ import socket
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 
+h=[0]
+
+
 def rs(n):
 	def sc(*args, **kwargs):
 		print(f"Caught SIGTERM in {n}: {args}, {kwargs}")
+		h=[0].shutdown()
 	signal(SIGTERM, sc)
 	
 
@@ -28,8 +32,10 @@ def main():
 	HOST = "0.0.0.0"
 	PORT = int(os.getenv("PORT", 80))
 	httpd = HTTPServer((HOST, PORT), SimpleHTTPRequestHandler)
+	h[0]=httpd
 	Process(target=ctr, daemon=True).start()
 	httpd.serve_forever()
+	print("EXITED")
 	
 
 def pt(n):
