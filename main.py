@@ -34,7 +34,7 @@ def counter(_ll, name, event):
 		log(name, ">", i)
 
 
-def stopper(event, httpd):
+def stopper(event):
 	event.wait()
 	log("GOT EVENT")
 	h[0].shutdown()
