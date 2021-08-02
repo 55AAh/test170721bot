@@ -13,7 +13,7 @@ h=[0]
 def rs(n):
 	def sc(*args, **kwargs):
 		print(f"Caught SIGTERM in {n}: {args}, {kwargs}")
-		h=[0].shutdown()
+		h[0].shutdown()
 	signal(SIGTERM, sc)
 	
 
