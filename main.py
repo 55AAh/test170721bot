@@ -22,13 +22,13 @@ def ctr():
 	
 def main():
 	for i in range(5):
-		Process(target=pt, args=("Process " + str(i + 1),)).start()
+		Process(target=pt, args=("Process " + str(i + 1),), daemon=True).start()
 	rs("Main")
 	HOST = "0.0.0.0"
 	PORT = int(os.getenv("PORT", 80))
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	sock.bind((HOST, PORT))
-	Process(target=ctr).start()
+	Process(target=ctr, daemon=True).start()
 	sock.listen()
 	print(f"LISTENING ON {HOST}:{PORT}")
 	sock.accept()
