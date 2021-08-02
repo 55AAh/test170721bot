@@ -6,8 +6,8 @@ import socket
 
 
 def rs(n):
-	def sc(*args, **kwargs):
-		print(f"Caught SIGTERM in {n}: {args}, {kwargs}")
+	def sc():
+		print(f"Caught SIGTERM in {n}")
 	signal(SIGTERM, sc)
 	
 
@@ -37,4 +37,6 @@ def pt(i):
 
 
 if __name__ == '__main__':
+	multiprocessing.set_start_method("spawn")
+	print(f"START METHOD = {multiprocessing.get_start_method()}")
 	main()
