@@ -25,7 +25,9 @@ def reg_signal(name, event):
 	def callback(*args, **kwargs):
 		log(f"Caught SIGTERM in {name}: {args}, {kwargs}")
 		if event:
+			log(f"Setting event in {name}...")
 			event.set()
+			log(f"Event was set in {name}...")
 	signal(SIGTERM, callback)
 	
 
