@@ -8,15 +8,17 @@ import socket
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 
-def reg_signal(event, name):
+def reg_signal(name, event):
 	def callback(*args, **kwargs):
 		print(f"Caught SIGTERM in {name}: {args}, {kwargs}")
-		event.set()
+		if event:
+			sleep(5)
+			event.set()
 	signal(SIGTERM, callback)
 	
 
-def counter(event, name):
-	reg_signal(event, name)
+def counter(name, event):
+	reg_signal(name, event)
 	i = 0
 	while True:
 		sleep(1)
@@ -33,10 +35,10 @@ def main():
 	event=Event()
 	processes = []
 	for i in range(5):
-		p = Process(target=counter, args=(event, "Process " + str(i + 1),), daemon=True)
+		p = Process(target=counter, args=("Process " + str(i + 1), None), daemon=True)
 		processes.append(p)
 		p.start()
-	reg_signal(event, "main")
+	reg_signal("main", event)
 	HOST = "0.0.0.0"
 	PORT = int(os.getenv("PORT", 80))
 	httpd = HTTPServer((HOST, PORT), SimpleHTTPRequestHandler)
