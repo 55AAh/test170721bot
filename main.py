@@ -31,22 +31,15 @@ def reg_signal(name, event):
 	signal(SIGTERM, callback)
 	
 
-def counter(_ll, name, event):
-	print("LOOOOOOOOOOCK", _ll)
+def counter(_ll):
 	ll[0] = _ll
-	reg_signal(name, event)
+	reg_signal("COUNTER", None)
 	i = 0
 	while True:
 		sleep(1)
 		i += 1
-		log(name, ">", i)
+		log("COUNT >", i)
 
-
-def stopper(event):
-	event.wait()
-	log("GOT EVENT")
-	h[0].shutdown()
-	log("KILLED WEB")
 
 
 def serve_forever(self, poll_interval=0.5):
@@ -81,39 +74,41 @@ def serve_forever(self, poll_interval=0.5):
 	finally:
 		self._BaseServer__shutdown_request = False
 		self._BaseServer__is_shut_down.set()
-	log("66666666666666")
 
-
-def main(_ll):
+def web_process_main(_ll):
 	ll[0] = _ll
 	event=Event()
-	processes = []
-	for i in range(1):
-		p = Process(target=counter, args=(ll[0], "Process " + str(i + 1), None), daemon=True)
-		processes.append(p)
-		p.start()
-	reg_signal("main", event)
+	reg_signal("MAIN", event)
+	
+	counter_process = Process(target=counter, args=(ll[0],), daemon=True)
+	counter_process.start()
+
+	log("WEB PROCESS STARTED")
 	HOST = "0.0.0.0"
 	PORT = int(os.getenv("PORT", 80))
 	httpd = HTTPServer((HOST, PORT), SimpleHTTPRequestHandler)
 	h[0] = httpd
-	httpd.serve_forever = serve_forever
 	Thread(target=stopper, args=(event,)).start()
+	httpd.serve_forever = serve_forever
 	httpd.serve_forever(httpd)
-	log("EXITING")
-	for p in processes:
-		p.kill()
-	log("EXITED")
+	log("HTTPD EXITED, KILLING COUNTER")
+	counter_process.kill()
+	counter_process.join()
+	log("WEB PROCESS STOPPED")
+
+
+def stopper(event):
+	event.wait()
+	log("GOT EVENT")
+	h[0].shutdown()
+	log("STOPPED httpd")
 	
 
 if __name__ == '__main__':
 	multiprocessing.set_start_method("spawn")
-	ll[0]=Lock()
+	ll[0] = Lock()
 	log(f"START METHOD = {multiprocessing.get_start_method()}")
-	p = Process(target=main, args=(ll[0],))
+	p = Process(target=web_process_main, args=(ll[0],))
 	p.start()
-	sleep(10)
-	log("SD HTTPD")
-	p.terminate()
 	p.join()
-	log("ME")
+	log("MAIN EXITED")
