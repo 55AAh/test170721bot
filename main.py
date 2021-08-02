@@ -32,11 +32,12 @@ def main():
 	httpd.serve_forever()
 	
 
-def pt(i):
-	rs(str(i))
+def pt(n):
+	i = 0
 	while True:
 		sleep(1)
-
+		i += 1
+		print(n, ">", i)
 
 if __name__ == '__main__':
 	multiprocessing.set_start_method("spawn")
