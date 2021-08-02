@@ -1,5 +1,6 @@
 from multiprocessing import Process
 from signal import signal, SIGTERM
+from time import sleep
 
 
 def rs(n):
@@ -12,7 +13,11 @@ def main():
     for i in range(5):
         Process(target=pt, args=("Process " + str(i + 1),)).start()
     rs("Main")
-    input("Waiting...")
+    i = 0
+    while True:
+        sleep(1)
+        i += 1
+        print(i)
 
 
 def pt(i):
