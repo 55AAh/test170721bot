@@ -34,6 +34,8 @@ def main():
 
 def pt(i):
 	rs(str(i))
+	while True:
+		sleep(1)
 
 
 if __name__ == '__main__':
