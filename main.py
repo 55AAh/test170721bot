@@ -27,6 +27,7 @@ def counter(name, event):
 
 def stopper(event, httpd):
 	event.wait()
+	print("GOT EVENT")
 	httpd.shutdown()
 
 
