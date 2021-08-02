@@ -31,14 +31,19 @@ def stopper(event, httpd):
 
 def main():
 	event=Event()
+	processes = []
 	for i in range(5):
-		Process(target=counter, args=(event, "Process " + str(i + 1),), daemon=True).start()
+		p = Process(target=counter, args=(event, "Process " + str(i + 1),), daemon=True)
+		processes.append(p)
+		p.start()
 	reg_signal(event, "main")
 	HOST = "0.0.0.0"
 	PORT = int(os.getenv("PORT", 80))
 	httpd = HTTPServer((HOST, PORT), SimpleHTTPRequestHandler)
 	Thread(target=stopper, args=(event, httpd)).start()
 	httpd.serve_forever()
+	for p in processes:
+		p.kill()
 	print("EXITED")
 	
 
