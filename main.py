@@ -37,7 +37,8 @@ def counter(_ll, name, event):
 def stopper(event):
 	event.wait()
 	log("GOT EVENT")
-	h[0].shutdown()
+	h[0]._BaseServer__shutdown_request = True
+	log("SET SHUTDOWN FLAG")
 
 
 def main(_ll):
