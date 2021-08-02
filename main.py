@@ -9,6 +9,7 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 
 ll = [0]
+h = [0]
 def log(*args, **kwargs):
 	with ll[0]:
 		print(*args, **kwargs)
@@ -36,7 +37,7 @@ def counter(_ll, name, event):
 def stopper(event, httpd):
 	event.wait()
 	log("GOT EVENT")
-	httpd.shutdown()
+	h[0].shutdown()
 
 
 def main(_ll):
@@ -51,7 +52,8 @@ def main(_ll):
 	HOST = "0.0.0.0"
 	PORT = int(os.getenv("PORT", 80))
 	httpd = HTTPServer((HOST, PORT), SimpleHTTPRequestHandler)
-	Thread(target=stopper, args=(event, httpd)).start()
+	h[0] = httpd
+	Thread(target=stopper, args=(event,)).start()
 	httpd.serve_forever()
 	log("EXITING")
 	for p in processes:
