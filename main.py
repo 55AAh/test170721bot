@@ -15,7 +15,7 @@ print(_ServerSelector)
 
 
 ll = [0]
-wp = [0]
+h = [0]
 def log(*args, **kwargs):
 	with ll[0]:
 		print(*args, **kwargs)
@@ -43,7 +43,7 @@ def counter(_ll, name, event):
 def stopper(event):
 	event.wait()
 	log("GOT EVENT")
-	wp[0].kill()
+	h[0].shutdown()
 	log("KILLED WEB")
 
 
@@ -94,6 +94,7 @@ def main(_ll):
 	HOST = "0.0.0.0"
 	PORT = int(os.getenv("PORT", 80))
 	httpd = HTTPServer((HOST, PORT), SimpleHTTPRequestHandler)
+	h[0] = httpd
 	httpd.serve_forever = serve_forever
 	Thread(target=stopper, args=(event,)).start()
 	httpd.serve_forever(httpd)
@@ -107,7 +108,6 @@ if __name__ == '__main__':
 	multiprocessing.set_start_method("spawn")
 	ll[0]=Lock()
 	log(f"START METHOD = {multiprocessing.get_start_method()}")
-	wp[0]=Process(target=main, args=(ll[0],))
-	wp[0].start()
+	Process(target=main, args=(ll[0],)).start()
 	sleep(90)
 	log("ME")
