@@ -28,7 +28,7 @@ def main():
 	PORT = int(os.getenv("PORT", 80))
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	sock.bind((HOST, PORT))
-	Process(target=ctr).start()
+	# Process(target=ctr).start()
 	sock.listen()
 	print(f"LISTENING ON {HOST}:{PORT}")
 
