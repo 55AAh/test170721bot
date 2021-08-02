@@ -100,7 +100,9 @@ def web_process_main(_ll):
 def stopper(event):
 	event.wait()
 	log("GOT EVENT")
-	h[0].shutdown()
+	h[0]._BaseServer__shutdown_request = True
+	sock=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+	sock.connect(("127.0.0.1",int(os.getenv("PORT", 80))))
 	log("STOPPED httpd")
 	while True:
 		log("STOPPER")
