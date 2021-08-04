@@ -14,7 +14,7 @@ __all__ = ["Webserver", "BackendAPI"]
 
 class Webserver(WorkerProcess):
     def __init__(self):
-        super().__init__(w_class=_WebserverWorker, name="Webserver", daemon=True)
+        super().__init__(w_class=_WebserverWorker, name="Webserver", daemon=True, ignore_sigterm=True)
         self.api_pipe = self.worker.pipe
 
     def start(self, host="0.0.0.0", port=int(os.getenv("PORT", 80))):

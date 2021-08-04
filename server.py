@@ -35,7 +35,7 @@ class Server:
         self.stop_event = receiver
         self._remote_stop_event = sender
 
-        def on_sigterm():
+        def on_sigterm(_signal_number, _frame):
             self.log.info("Caught SIGTERM")
             self._remote_stop_event.send(None)
 
@@ -110,7 +110,7 @@ class Server:
 
 class _PollerProcess(WorkerProcess):
     def __init__(self):
-        super().__init__(w_class=_PollerWorker, name="Poller", daemon=True)
+        super().__init__(w_class=_PollerWorker, name="Poller", daemon=True, ignore_sigterm=True)
 
     def stop(self):
         self.terminate()
