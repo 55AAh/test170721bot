@@ -127,7 +127,7 @@ class _PollerWorker(DuplexPipeComponent, LoggingComponent, Worker):
         log.debug("Started")
         while True:
             offset = self.pipe.recv() + 1
-            log.info(f"Polling ({offset})...")
+            log.debug(f"Polling ({offset})...")
             updates = tg_api.get_updates(offset=offset, timeout=timeout)
             for update in updates:
                 self.pipe.send(update)
