@@ -59,7 +59,7 @@ class Server:
         try:
             while not self.stop_event.poll():
                 connection.wait([self.poller.worker.pipe, self.webserver.api_pipe, self.stop_event])
-                self.handle_updates()
+                self.handle_update()
                 self.handle_api_request()
         except KeyboardInterrupt:
             pass
@@ -75,19 +75,17 @@ class Server:
         self.log.info("Stopped")
         self.set_webhook()
 
-    def handle_updates(self):
+    def handle_update(self):
         pipe = self.poller.worker.pipe
-        while pipe.poll() and not self.stop_event.poll():
-            update = pipe.recv()
-            if update:
-                self.handle_update(update)
-            else:
-                pipe.send(self.last_update_id)
-
-    def handle_update(self, update: dict):
-        self.log.info(f"\tUPDATE TEXT: {update.setdefault('message', {}).setdefault('text', None)}")
-        self.tg_api.echo_text(update["message"])
-        self.last_update_id = update["update_id"]
+        if not pipe.poll() or self.stop_event.poll():
+            return
+        update = pipe.recv()
+        if update:
+            self.log.info(f"\tUPDATE TEXT: {update.setdefault('message', {}).setdefault('text', None)}")
+            self.tg_api.echo_text(update["message"])
+            self.last_update_id = update["update_id"]
+        else:
+            pipe.send(self.last_update_id)
 
     def handle_api_request(self):
         pipe = self.webserver.api_pipe
