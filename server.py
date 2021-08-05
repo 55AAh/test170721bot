@@ -49,7 +49,7 @@ class Server:
         self.log.info("Started")
 
         self.db.connect()
-        self.poller.start(self.tg_api, timeout=3)
+        self.poller.start(self.tg_api, timeout=90)
 
         self.last_update_id = self.db.last_update_id
         self.poller.worker.pipe.send(self.last_update_id)
