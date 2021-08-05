@@ -69,7 +69,7 @@ class Server:
         self.db.disconnect()
         self.log.info("Data saved")
         self.poller.stop()
-        self.wevserver.stop()
+        self.webserver.stop()
         self.poller.join()
         self.webserver.join()
         self.log.info("Stopped")
