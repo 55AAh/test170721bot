@@ -9,7 +9,7 @@ class TelegramApi:
     def _request(self, method, params=None):
         response = requests.get(f"https://api.telegram.org/bot{self._bot_token}/{method}", params=params)
         response_json = response.json()
-        assert response_json["ok"]
+        assert response_json["ok"], f"Bad response: {response_json}"
         result = response_json["result"]
         return result
 
