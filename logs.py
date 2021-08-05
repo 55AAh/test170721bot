@@ -1,5 +1,6 @@
 import logging
 import logging.config
+import os
 import sys
 import multiprocessing
 from copy import deepcopy
@@ -30,7 +31,8 @@ class Logger:
             config['formatters'] = {
                 'default': {
                     'class': 'logging.Formatter',
-                    'format': '%(asctime)s %(levelname)-8s %(processName)-15s %(name)-15s %(message)s'
+                    'format': os.environ.get("LOG_FORMAT",
+                                             '%(asctime)s %(levelname)-8s %(processName)-15s %(name)-15s %(message)s')
                 }
             }
             for h in config['handlers'].keys():
@@ -46,7 +48,7 @@ class Logger:
             }
         config.setdefault("root", {
             'handlers': list(config['handlers'].keys()),
-            'level': 'DEBUG'
+            'level': os.environ.get("LOG_LEVEL", "DEBUG")
         })
         config.setdefault('version', 1)
         config.setdefault('disable_existing_loggers', False)
@@ -62,14 +64,14 @@ class Logger:
         Caller process will also be bound. (It should not be inherited from LoggingComponent.) """
         if Logger._LISTENER_ACTIVE:
             return
-        Logger.get_logger("LOG_LISTENER").debug("Starting...")
+        Logger.get_logger("LOG_LST").debug("Starting...")
         if Logger._LISTENER is None:
             Logger._LISTENER = _LogListenerProcess()
             Logger._PIPE_HANDLER = Logger._LISTENER.handler
         Logger._LISTENER.start(Logger._CURRENT_CONFIG)
         Logger._LISTENER_ACTIVE = True
         Logger.__deserialize_setup__(Logger.__serialize_setup__())
-        Logger.get_logger("LOG_LISTENER").debug("Started")
+        Logger.get_logger("LOG_LST").debug("Started")
 
     @staticmethod
     def stop_listener():
@@ -78,12 +80,12 @@ class Logger:
         Caller process will be unbound and returned to post-setup_root state. """
         if not Logger._LISTENER_ACTIVE:
             return
-        Logger.get_logger("LOG_LISTENER").debug("Stopping...")
+        Logger.get_logger("LOG_LST").debug("Stopping...")
         Logger._LISTENER.stop()
         Logger._LISTENER.join()
         Logger._LISTENER_ACTIVE = False
         Logger.setup(Logger._CURRENT_CONFIG)
-        Logger.get_logger("LOG_LISTENER").debug("Stopped")
+        Logger.get_logger("LOG_LST").debug("Stopped")
 
     @staticmethod
     def clear_setup():

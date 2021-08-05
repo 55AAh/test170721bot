@@ -1,9 +1,8 @@
+import os
 from multiprocessing import Pipe, connection
 from signal import SIGTERM, signal
 from time import sleep
-import requests
 
-from event_component import EventComponent
 from pipe_component import DuplexPipeComponent
 from worker_process import WorkerProcess, Worker
 from telegram_api import TelegramApi
@@ -87,6 +86,7 @@ class Server:
 
     def handle_update(self, update: dict):
         self.log.info(f"\tUPDATE TEXT: {update.setdefault('message', {}).setdefault('text', None)}")
+        self.tg_api.echo_text(update["message"])
         self.last_update_id = update["update_id"]
 
     def handle_api_request(self):
@@ -100,11 +100,15 @@ class Server:
 
     def clear_webhook(self):
         self.webhook_log.info("Clearing...")
+        self.tg_api.set_webhook(url="")
         self.webhook_log.info("Cleared")
 
     def set_webhook(self):
         self.webhook_log.info("Setting...")
-        requests.get("https://test170721.herokuapp.com/api/wake")
+        heroku_link = os.getenv("HEROKU_LINK")
+        if heroku_link:
+            heroku_link += "api/ping"
+            self.tg_api.set_webhook(url=heroku_link)
         self.webhook_log.info("Set")
 
 

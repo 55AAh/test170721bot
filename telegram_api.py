@@ -15,3 +15,14 @@ class TelegramApi:
 
     def get_updates(self, offset=None, timeout=None):
         return self._request("getUpdates", params={"offset": offset, "timeout": timeout})
+
+    def set_webhook(self, url):
+        return self._request("setWebhook", params={"url": url, "max_connections": 1})
+
+    def send_text(self, chat_id, text, reply_to_message_id=None, allow_sending_without_reply=True):
+        return self._request("sendMessage", params={"chat_id": chat_id, "text": text,
+                                                    "reply_to_message_id": reply_to_message_id,
+                                                    "allow_sending_without_reply": allow_sending_without_reply})
+
+    def echo_text(self, msg):
+        return self.send_text(chat_id=msg["chat"]["id"], text=msg["text"], reply_to_message_id=msg["message_id"])
