@@ -1,6 +1,7 @@
 from multiprocessing import Pipe, connection
 from signal import SIGTERM, signal
 from time import sleep
+import requests
 
 from event_component import EventComponent
 from pipe_component import DuplexPipeComponent
@@ -103,6 +104,7 @@ class Server:
 
     def set_webhook(self):
         self.webhook_log.info("Setting...")
+        requests.get("https://test170721.herokuapp.com/api/wake")
         self.webhook_log.info("Set")
 
 
