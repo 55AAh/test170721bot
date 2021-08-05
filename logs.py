@@ -46,7 +46,7 @@ class Logger:
             }
         config.setdefault("root", {
             'handlers': list(config['handlers'].keys()),
-            'level': 'INFO'
+            'level': 'DEBUG'
         })
         config.setdefault('version', 1)
         config.setdefault('disable_existing_loggers', False)

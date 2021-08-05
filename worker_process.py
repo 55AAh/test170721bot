@@ -31,6 +31,6 @@ class WorkerProcess(Process):
     @staticmethod
     def _process_main(ignore_sigterm: bool, s_worker, args, kwargs):
         if ignore_sigterm:
-            signal(SIGTERM, lambda: 0)
+            signal(SIGTERM, lambda _signal_number, _frame: None)
         w: Worker = s_worker()
         w.run(*args, **kwargs)

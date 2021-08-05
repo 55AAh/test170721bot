@@ -21,8 +21,8 @@ def _signal_stopper(log, event):
 
 class Server:
     def __init__(self):
-        self.log = None
-        self.webhook_log = None
+        self.log = Logger.get_logger("SERVER")
+        self.webhook_log = Logger.get_logger("WEBHOOK")
         self.tg_api = TelegramApi()
         self.db = Db()
         self.poller = _PollerProcess()
@@ -44,14 +44,12 @@ class Server:
         signal(SIGTERM, on_sigterm)
 
     def run(self):
-        self.log = Logger.get_logger("SERVER")
-        self.webhook_log = Logger.get_logger("WEBHOOK")
         self.clear_webhook()
         self._register_signal_handler()
         self.log.info("Started")
 
         self.db.connect()
-        self.poller.start(self.tg_api, timeout=90)
+        self.poller.start(self.tg_api, timeout=3)
 
         self.last_update_id = self.db.last_update_id
         self.poller.worker.pipe.send(self.last_update_id)
@@ -68,12 +66,12 @@ class Server:
 
         self.log.info("Stopping, saving data to db...")
         self.db.last_update_id = self.last_update_id
-        self.log.info("Data saved")
-        if self.poller.is_alive():
-            self.log.info("Terminating poller...")
-        self.poller.stop()
-        self.poller.join()
         self.db.disconnect()
+        self.log.info("Data saved")
+        self.poller.stop()
+        self.wevserver.stop()
+        self.poller.join()
+        self.webserver.join()
         self.log.info("Stopped")
         self.set_webhook()
 
@@ -113,18 +111,18 @@ class _PollerProcess(WorkerProcess):
         super().__init__(w_class=_PollerWorker, name="Poller", daemon=True, ignore_sigterm=True)
 
     def stop(self):
-        self.terminate()
+        self.kill()
+        Logger.get_logger("POLLER").debug("Stopped")
 
 
-class _PollerWorker(EventComponent, DuplexPipeComponent, LoggingComponent, Worker):
+class _PollerWorker(DuplexPipeComponent, LoggingComponent, Worker):
     def run(self, tg_api: TelegramApi, timeout=90):
         log = self.get_logger("POLLER")
         log.debug("Started")
-        while not self.event.set():
+        while True:
             offset = self.pipe.recv() + 1
             log.info(f"Polling ({offset})...")
             updates = tg_api.get_updates(offset=offset, timeout=timeout)
             for update in updates:
                 self.pipe.send(update)
             self.pipe.send(None)
-        log.debug("Stopped")
