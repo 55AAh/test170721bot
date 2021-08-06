@@ -59,7 +59,7 @@ class _HTTPRequestHandler(SimpleHTTPRequestHandler):
             return True
 
     def log_message(self, fmt, *args):
-        self.server.log.info(("%s:%s - - " % self.client_address) + fmt % args)
+        self.server.log.debug(("%s:%s - - " % self.client_address) + fmt % args)
 
     def do_GET(self):
         if self.handle_api_request("GET") is not None:

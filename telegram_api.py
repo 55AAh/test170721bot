@@ -19,11 +19,17 @@ class TelegramApi:
     def _request(self, method, params=None):
         response = requests.get(f"https://api.telegram.org/bot{self._bot_token}/{method}", params=params)
         response_json = response.json()
-        if not response_json["ok"] and response_json["error_code"] == 429:
-            sleep_time = response_json["parameters"]["retry_after"]
-            self.log.warning(f"Too many requests, sleeping for {sleep_time}s...")
-            self.idle_until = time() + sleep_time
-            return None
+        if not response_json["ok"]:
+            error_code = response_json["error_code"]
+            if error_code == 429:
+                sleep_time = response_json["parameters"]["retry_after"]
+                self.log.warning(f"Too many requests, sleeping for {sleep_time}s...")
+                self.idle_until = time() + sleep_time
+                return None
+            elif error_code == 409:
+                self.log.warning(f"Webhook was not cleared before getUpdates")
+                self.clear_webhook()
+                return self._request(method, params=params)
         assert response_json["ok"], f"Bad response: {response_json}"
         result = response_json["result"]
         return result
@@ -33,6 +39,9 @@ class TelegramApi:
 
     def set_webhook(self, url):
         return self._request("setWebhook", params={"url": url, "max_connections": 1})
+
+    def clear_webhook(self):
+        return self.set_webhook(url=None)
 
     def send_text(self, chat_id, text, reply_to_message_id=None, allow_sending_without_reply=True):
         response = self._request("sendMessage", params={"chat_id": chat_id, "text": text,

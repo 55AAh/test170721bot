@@ -25,6 +25,7 @@ class Db:
         self.db_conn = psycopg2.connect(db_url)
         self.db_cur = self.db_conn.cursor()
         self.transaction = _Transaction(self.db_conn)
+        self.db_cur.execute("SELECT pg_advisory_lock(0)")
 
     @property
     def last_update_id(self):

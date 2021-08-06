@@ -46,11 +46,12 @@ class Server:
         signal(SIGTERM, on_sigterm)
 
     def run(self):
+        self.db.connect()
+
         self.clear_webhook()
         self._register_signal_handler()
         self.log.info("Started")
 
-        self.db.connect()
         self.poller.start(self.tg_api, timeout=90)
 
         self.last_update_id = self.db.last_update_id
@@ -66,15 +67,14 @@ class Server:
         except KeyboardInterrupt:
             pass
 
-        self.log.info("Stopping, saving data to db...")
-        self.db.last_update_id = self.last_update_id
-        self.db.disconnect()
-        self.log.info("Data saved")
         self.poller.stop()
         self.webserver.stop()
         self.poller.join()
         self.webserver.join()
-        self.log.info("Stopped")
+        self.log.info("Saving data to db...")
+        self.db.last_update_id = self.last_update_id
+        self.db.disconnect()
+        self.log.info("Data saved, stopped")
         self.set_webhook()
 
     def handle_update(self):
@@ -110,12 +110,10 @@ class Server:
         pipe.send(response)
 
     def clear_webhook(self):
-        self.webhook_log.info("Clearing...")
-        self.tg_api.set_webhook(url="")
+        self.tg_api.clear_webhook()
         self.webhook_log.info("Cleared")
 
     def set_webhook(self):
-        self.webhook_log.info("Setting...")
         heroku_link = os.getenv("HEROKU_LINK")
         if heroku_link:
             heroku_link += "api/ping"
