@@ -28,7 +28,7 @@ class Server:
         self.tg_api = TelegramApi()
         self.poller = _PollerProcess()
         self.webserver = Webserver()
-        self.bot = Bot(self, self.db, self.tg_api)
+        self.bot = Bot(self.db, self.tg_api)
         self.last_update_id = None
         self.stop_event, self._remote_stop_event = None, None
 
@@ -58,11 +58,13 @@ class Server:
         self.last_update_id = self.db.last_update_id
         self.poller.worker.pipe.send(self.last_update_id)
 
+        tg_update = self.handle_tg_updates()
+        web_api_request = self.handle_web_api_requests()
         try:
             while not self.stop_event.poll():
                 connection.wait([self.poller.worker.pipe, self.webserver.api_pipe, self.stop_event])
-                self.handle_update()
-                self.handle_web_api_request()
+                next(tg_update)
+                next(web_api_request)
         except KeyboardInterrupt:
             pass
 
@@ -76,37 +78,29 @@ class Server:
         self.log.info("Data saved, stopped")
         self.set_webhook()
 
-    def handle_update(self):
+    def handle_tg_updates(self):
         pipe = self.poller.worker.pipe
-        if not pipe.poll() or self.stop_event.poll():
-            return
-        update = pipe.recv()
-        if update:
-            self.bot.handle_update(update)
-            if self.stop_event.poll():
-                return
-            self.last_update_id = update["update_id"]
-        else:
-            pipe.send(self.last_update_id)
+        while True:
+            while pipe.poll():
+                update = pipe.recv()
+                if update:
+                    yield from self.bot.handle_tg_update(update)
+                    self.last_update_id = update["update_id"]
+                else:
+                    pipe.send(self.last_update_id)
+                yield
+            yield
 
-    def call_tg_api(self, function, *args, **kwargs):
-        while not self.stop_event.poll():
-            result = function(*args, **kwargs)
-            if result is not None:
-                return result
-            while not self.stop_event.poll():
-                self.handle_web_api_request()
-                if not self.tg_api.idle():
-                    break
-
-    def handle_web_api_request(self):
+    def handle_web_api_requests(self):
         pipe = self.webserver.api_pipe
-        if not pipe.poll() or self.stop_event.poll():
-            return
-        request = pipe.recv()
-        self.log.info(f"web api request: {request}")
-        response = BackendAPI.handle(self, request)
-        pipe.send(response)
+        while True:
+            while pipe.poll():
+                request = pipe.recv()
+                self.log.info(f"web api request: {request}")
+                response = BackendAPI.handle(self, request)
+                pipe.send(response)
+                yield
+            yield
 
     def clear_webhook(self):
         self.tg_api.clear_webhook()
@@ -136,7 +130,12 @@ class _PollerWorker(DuplexPipeComponent, LoggingComponent, Worker):
         while True:
             offset = self.pipe.recv() + 1
             log.debug(f"Polling ({offset})...")
-            updates = tg_api.get_updates(offset=offset, timeout=timeout)
+            updates_generator = tg_api.get_updates(offset=offset, timeout=timeout)
+            try:
+                while True:
+                    next(updates_generator)
+            except StopIteration as e:
+                updates = e.value
             for update in updates:
                 self.pipe.send(update)
             self.pipe.send(None)
