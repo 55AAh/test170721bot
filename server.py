@@ -46,6 +46,7 @@ class Server:
         signal(SIGTERM, on_sigterm)
 
     def run(self):
+        self.webserver.start()
         self.db.connect()
 
         self.clear_webhook()
@@ -56,8 +57,6 @@ class Server:
 
         self.last_update_id = self.db.last_update_id
         self.poller.worker.pipe.send(self.last_update_id)
-
-        self.webserver.start()
 
         try:
             while not self.stop_event.poll():
