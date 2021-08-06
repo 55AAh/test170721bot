@@ -8,6 +8,7 @@ from worker_process import WorkerProcess, Worker
 from telegram_api import TelegramApi
 from db import Db
 from webserver import Webserver, BackendAPI
+from bot import Bot
 from logs import Logger, LoggingComponent
 
 __all__ = ["Server"]
@@ -23,10 +24,11 @@ class Server:
     def __init__(self):
         self.log = Logger.get_logger("SERVER")
         self.webhook_log = Logger.get_logger("WEBHOOK")
-        self.tg_api = TelegramApi()
         self.db = Db()
+        self.tg_api = TelegramApi()
         self.poller = _PollerProcess()
         self.webserver = Webserver()
+        self.bot = Bot(self, self.db, self.tg_api)
         self.last_update_id = None
         self.stop_event, self._remote_stop_event = None, None
 
@@ -60,7 +62,7 @@ class Server:
             while not self.stop_event.poll():
                 connection.wait([self.poller.worker.pipe, self.webserver.api_pipe, self.stop_event])
                 self.handle_update()
-                self.handle_api_request()
+                self.handle_web_api_request()
         except KeyboardInterrupt:
             pass
 
@@ -81,18 +83,29 @@ class Server:
             return
         update = pipe.recv()
         if update:
-            self.log.info(f"\tUPDATE TEXT: {update.setdefault('message', {}).setdefault('text', None)}")
-            self.tg_api.echo_text(update["message"])
+            self.bot.handle_update(update)
+            if self.stop_event.poll():
+                return
             self.last_update_id = update["update_id"]
         else:
             pipe.send(self.last_update_id)
 
-    def handle_api_request(self):
+    def call_tg_api(self, function, *args, **kwargs):
+        while not self.stop_event.poll():
+            result = function(*args, **kwargs)
+            if result is not None:
+                return result
+            while not self.stop_event.poll():
+                self.handle_web_api_request()
+                if not self.tg_api.idle():
+                    break
+
+    def handle_web_api_request(self):
         pipe = self.webserver.api_pipe
         if not pipe.poll() or self.stop_event.poll():
             return
         request = pipe.recv()
-        self.log.info(f"api request: {request}")
+        self.log.info(f"web api request: {request}")
         response = BackendAPI.handle(self, request)
         pipe.send(response)
 

@@ -132,7 +132,7 @@ class LoggingComponent:
 
 class _LogListenerProcess(WorkerProcess):
     def __init__(self):
-        super().__init__(w_class=_LogListenerWorker, name="LoggerListener", daemon=False, ignore_sigterm=True)
+        super().__init__(w_class=_LogListenerWorker, name="LoggerListener", daemon=True, ignore_sigterm=True)
         receiver, sender = multiprocessing.Pipe(duplex=False)
         pipe = sender
         _remote_pipe = receiver
