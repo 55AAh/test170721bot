@@ -11,6 +11,14 @@ class TelegramApi:
         self.log = Logger.get_logger("TG_API")
         self.sent_timestamps = []
 
+    @staticmethod
+    def block_complete_request(request_gen):
+        try:
+            while True:
+                next(request_gen)
+        except StopIteration as e:
+            return e.value
+
     def _request(self, method, params=None):
         response = requests.get(f"https://api.telegram.org/bot{self._bot_token}/{method}", params=params)
         response_json = response.json()

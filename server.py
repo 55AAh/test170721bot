@@ -103,15 +103,15 @@ class Server:
             yield
 
     def clear_webhook(self):
-        self.tg_api.clear_webhook()
+        self.tg_api.block_complete_request(self.tg_api.clear_webhook())
         self.webhook_log.info("Cleared")
 
     def set_webhook(self):
         heroku_link = os.getenv("HEROKU_LINK")
         if heroku_link:
             heroku_link += "api/ping"
-            self.tg_api.set_webhook(url=heroku_link)
-        self.webhook_log.info("Set")
+            self.tg_api.block_complete_request(self.tg_api.set_webhook(url=heroku_link))
+            self.webhook_log.info("Set")
 
 
 class _PollerProcess(WorkerProcess):
@@ -130,12 +130,7 @@ class _PollerWorker(DuplexPipeComponent, LoggingComponent, Worker):
         while True:
             offset = self.pipe.recv() + 1
             log.debug(f"Polling ({offset})...")
-            updates_generator = tg_api.get_updates(offset=offset, timeout=timeout)
-            try:
-                while True:
-                    next(updates_generator)
-            except StopIteration as e:
-                updates = e.value
+            updates = tg_api.block_complete_request(tg_api.get_updates(offset=offset, timeout=timeout))
             for update in updates:
                 self.pipe.send(update)
             self.pipe.send(None)
