@@ -1,3 +1,4 @@
+import json
 import os
 import psycopg2
 
@@ -37,6 +38,10 @@ class Db:
     def last_update_id(self, value):
         with self.transaction:
             self.db_cur.execute("UPDATE info SET last_update_id = %s", (value,))
+
+    def save_update(self, update):
+        with self.transaction:
+            self.db_cur.execute("INSERT INTO updates VALUES (now(), %s)", (json.dumps(update),))
 
     def disconnect(self):
         assert self.db_conn and self.db_cur

@@ -8,6 +8,6 @@ class Bot:
         self.log = Logger.get_logger("BOT")
 
     def handle_tg_update(self, update):
+        self.db.save_update(update)
         self.log.info(f"\tUPDATE TEXT: {update.setdefault('message', {}).setdefault('text', None)}")
-        yield from self.tg_api.echo_text(update["message"])
-        self.log.info(f"\tUPDATE HANDLED")
+        yield
