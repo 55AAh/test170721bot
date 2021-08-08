@@ -9,5 +9,5 @@ class Bot:
 
     def handle_tg_update(self, update):
         self.db.save_update(update)
-        self.log.info(f"\tUPDATE TEXT: {update.setdefault('message', {}).setdefault('text', None)}")
+        self.log.info(f"{update.setdefault('message', {}).setdefault('text', None)}")
         yield
