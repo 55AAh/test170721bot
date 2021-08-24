@@ -11,6 +11,7 @@ def do_request(address, timeout=None, reconnect=False):
             if reconnect:
                 sleep(1)
             else:
+                print(e)
                 return None
 
 
