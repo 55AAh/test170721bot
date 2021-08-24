@@ -22,7 +22,7 @@ def do_request(host, command, retry=False, wait_ok=False):
 
 def execute(args):
     if args.command == "finish":
-        return do_request(args.host, "finish", retry=True)
+        return do_request(args.host, "finish")
     if args.command == "shutdown":
         return do_request(args.host, "shutdown")
 
