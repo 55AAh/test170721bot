@@ -4,27 +4,36 @@ from time import sleep
 import requests
 
 
-def do_request(address, timeout=None, reconnect=False):
+def do_request(host, command, timeout=None, reconnect=False):
     while True:
         try:
-            return requests.get(address, timeout=timeout)
-        except requests.ConnectionError or requests.Timeout as e:
-            if reconnect:
-                sleep(1)
-            else:
-                print(e)
+            return requests.get(urljoin(host, f"/api/{command}"), timeout=timeout)
+        except requests.ConnectionError as e:
+            if not reconnect:
+                print("CLI:", e)
                 return None
+        except requests.Timeout as e:
+            if timeout:
+                print("CLI:", e)
+                return None
+        sleep(1)
+
+
+def execute(args):
+    if args.command == "finish":
+        return do_request(args.host, "finish", reconnect=True)
+    if args.command == "shutdown":
+        return do_request(args.host, "shutdown")
+    if args.command == "try_shutdown":
+        return do_request(args.host, "shutdown", timeout=3)
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=["shutdown"])
-    parser.add_argument("--host", default="https://127.0.0.1/")
-    parser.add_argument("--timeout", type=int)
-    parser.add_argument("--reconnect", action="store_const", const=True)
+    parser.add_argument("command", choices=["finish", "shutdown", "try_shutdown"])
+    parser.add_argument("--host", default="http://127.0.0.1/")
     args = parser.parse_args()
-    if args.command == "shutdown":
-        print(do_request(urljoin(args.host, "/api/shutdown"), timeout=args.timeout, reconnect=args.reconnect))
+    print(f"CLI: {args.command}: {execute(args)}")
 
 
 if __name__ == '__main__':

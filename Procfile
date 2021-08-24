@@ -1,2 +1,2 @@
-release: python cli.py shutdown --host=$HEROKU_LINK --timeout=1
+release: python cli.py try_shutdown --host=$HEROKU_LINK
 web: python main.py
