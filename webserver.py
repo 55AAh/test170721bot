@@ -78,6 +78,8 @@ class _FrontendAPI:
     def handle(handler, method: str, function: str, parameters: list[str]):
         if function == "ping":
             _FrontendAPI.handle_ping(handler, method, parameters)
+        elif function == "finish":
+            _FrontendAPI.handle_finish(handler, method, parameters)
         elif function == "shutdown":
             _FrontendAPI.handle_shutdown(handler, method, parameters)
         else:
@@ -106,6 +108,21 @@ class _FrontendAPI:
         handler.wfile.write(body if body is not None else b'')
 
     @staticmethod
+    def handle_finish(handler, method, parameters):
+        if method != "GET":
+            return handler.send_error(405)
+        if len(parameters) > 0:
+            return handler.send_error(404, "Parameters not supported")
+        handler.send_response(200)
+        handler.send_header("Content-Type", "application/json")
+        handler.end_headers()
+        body = {
+            "ok": _FrontendAPI.request(handler, "finish"),
+        }
+        body = json.dumps(body).encode("utf-8")
+        handler.wfile.write(body if body is not None else b'')
+
+    @staticmethod
     def handle_shutdown(handler, method, parameters):
         if method != "GET":
             return handler.send_error(405)
@@ -125,6 +142,10 @@ class BackendAPI:
     @staticmethod
     def handle(server, request):
         if request == "ping":
+            return True
+        elif request == "finish":
+            from time import sleep
+            sleep(5)
             return True
         elif request == "shutdown":
             server._remote_stop_event.send(None)

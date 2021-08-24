@@ -1,2 +1,2 @@
-release: python cli.py try_shutdown --host=$HEROKU_LINK
+release: python cli.py finish --host=$HEROKU_LINK
 web: python main.py
