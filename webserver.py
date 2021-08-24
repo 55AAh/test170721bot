@@ -145,7 +145,11 @@ class BackendAPI:
             return True
         elif request == "finish":
             from time import sleep
-            sleep(5)
+            i = 0
+            while True:
+                i += 1
+                server.log.info(f"FINISH {i}")
+                sleep(1)
             return True
         elif request == "shutdown":
             server._remote_stop_event.send(None)
