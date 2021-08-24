@@ -1,2 +1,2 @@
-release: python cli.py shutdown  --wait_200
+release: python cli.py shutdown --timeout=1
 web: python main.py
