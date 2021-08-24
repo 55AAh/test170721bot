@@ -144,13 +144,7 @@ class BackendAPI:
         if request == "ping":
             return True
         elif request == "finish":
-            from time import sleep
-            i = 0
-            while True:
-                i += 1
-                server.log.info(f"FINISH {i}")
-                sleep(1)
-            return True
+            return False
         elif request == "shutdown":
             server._remote_stop_event.send(None)
             return True
