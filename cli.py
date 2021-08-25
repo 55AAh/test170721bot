@@ -9,7 +9,7 @@ def do_request(host, command, retry=False, wait_ok=False):
     while True:
         try:
             response = requests.get(urljoin(host, f"/api/{command}"), timeout=5)
-            if not wait_ok or response.json()['ok']:
+            if not wait_ok or response.json()['ok'] or True:
                 return response.status_code, response.json()
         except requests.ConnectionError or requests.Timeout as e:
             if not retry:
