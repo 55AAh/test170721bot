@@ -144,7 +144,7 @@ class BackendAPI:
         if request == "ping":
             return True
         elif request == "finish":
-            return False
+            return True
         elif request == "shutdown":
             server._remote_stop_event.send(None)
             return True
