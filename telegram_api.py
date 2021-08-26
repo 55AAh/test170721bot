@@ -23,7 +23,7 @@ class TelegramApiRequest:
             error_code = response_json["error_code"]
             if error_code == 429:
                 sleep_time = response_json["parameters"]["retry_after"]
-                self._api._log.warning(f"Too many requests, sleeping for {sleep_time}s...")
+                self._api.log.warning(f"Too many requests, sleeping for {sleep_time}s...")
                 idle_until = time() + sleep_time
                 while time() <= idle_until:
                     yield True
@@ -31,7 +31,7 @@ class TelegramApiRequest:
                 result = yield from self(*args)
                 return result
             elif error_code == 409:
-                self._api._log.warning(f"Webhook was not cleared before getUpdates")
+                self._api.log.warning(f"Webhook was not cleared before getUpdates")
                 yield from self._api.clear_webhook()
                 return self(*args)
         assert response_json["ok"], f"Bad response: {response_json}"
