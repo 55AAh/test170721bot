@@ -5,6 +5,7 @@ import sys
 import multiprocessing
 from copy import deepcopy
 
+from environment import Environment
 from worker_process import WorkerProcess, Worker
 from serialized_class import component
 
@@ -31,8 +32,7 @@ class Logger:
             config['formatters'] = {
                 'default': {
                     'class': 'logging.Formatter',
-                    'format': os.environ.get("LOG_FORMAT",
-                                             '%(asctime)s %(levelname)-8s %(processName)-15s %(name)-15s %(message)s')
+                    'format': Environment.LOG_FORMAT,
                 }
             }
             for h in config['handlers'].keys():
@@ -43,12 +43,12 @@ class Logger:
                     'class': 'logging.StreamHandler',
                     'stream': sys.stdout,
                     'formatter': list(config['formatters'].keys())[0],
-                    'level': 'DEBUG',
+                    'level': Environment.LOG_LEVEL,
                 }
             }
         config.setdefault("root", {
             'handlers': list(config['handlers'].keys()),
-            'level': os.environ.get("LOG_LEVEL", "DEBUG")
+            'level': Environment.LOG_LEVEL,
         })
         config.setdefault('version', 1)
         config.setdefault('disable_existing_loggers', False)
@@ -108,7 +108,7 @@ class Logger:
             _config = deepcopy(config)
             _config.setdefault('root', {})
             _config['root']['handlers'] = []
-            _config['root'].setdefault('level', 'DEBUG')
+            _config['root'].setdefault('level', Environment.LOG_LEVEL)
             Logger.setup(_config)
             Logger._CURRENT_CONFIG = config
             Logger._PIPE_HANDLER = pipe_handler

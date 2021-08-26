@@ -1,6 +1,7 @@
+import psycopg2
 import json
 import os
-import psycopg2
+import pickle
 
 __all__ = ["Db"]
 
@@ -28,20 +29,38 @@ class Db:
         self.transaction = _Transaction(self.db_conn)
         self.db_cur.execute("SELECT pg_advisory_lock(0)")
 
+    def execute(self, query, *variables):
+        with self.transaction:
+            self.db_cur.execute(query, vars=variables)
+
+    def fetch_one(self, query, *variables):
+        with self.transaction:
+            self.db_cur.execute(query, vars=variables)
+            return self.db_cur.fetchone()
+
+    def fetch_many(self, query, *variables):
+        with self.transaction:
+            self.db_cur.execute(query, vars=variables)
+            return self.db_cur.fetchmany()
+
+    @property
+    def current_promise(self):
+        return self.fetch_one("SELECT current_promise FROM info")[0]
+
+    @current_promise.setter
+    def current_promise(self, value):
+        self.execute("UPDATE info SET current_promise = %s", value)
+
     @property
     def last_update_id(self):
-        with self.transaction:
-            self.db_cur.execute("SELECT last_update_id FROM info")
-            return self.db_cur.fetchone()[0]
+        return self.fetch_one("SELECT last_update_id FROM info")[0]
 
     @last_update_id.setter
     def last_update_id(self, value):
-        with self.transaction:
-            self.db_cur.execute("UPDATE info SET last_update_id = %s", (value,))
+        self.execute("UPDATE info SET last_update_id = %s", value)
 
     def save_update(self, update):
-        with self.transaction:
-            self.db_cur.execute("INSERT INTO updates VALUES (now(), %s)", (json.dumps(update),))
+        self.execute("INSERT INTO updates VALUES (now(), %s)", json.dumps(update))
 
     def disconnect(self):
         assert self.db_conn and self.db_cur
