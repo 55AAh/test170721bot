@@ -76,7 +76,9 @@ class _HTTPRequestHandler(SimpleHTTPRequestHandler):
 class _FrontendAPI:
     @staticmethod
     def handle(handler, method: str, function: str, parameters: list[str]):
-        if function == "ping":
+        if function == "webhook":
+            _FrontendAPI.handle_webhook(handler, method, parameters)
+        elif function == "ping":
             _FrontendAPI.handle_ping(handler, method, parameters)
         elif function == "finish":
             _FrontendAPI.handle_finish(handler, method, parameters)
@@ -90,6 +92,10 @@ class _FrontendAPI:
         with handler.server.api_pipe_lock:
             handler.server.api_pipe.send(request)
             return handler.server.api_pipe.recv()
+
+    @staticmethod
+    def handle_webhook(handler, method, parameters):
+        return handler.send_error(405)
 
     @staticmethod
     def handle_ping(handler, method, parameters):

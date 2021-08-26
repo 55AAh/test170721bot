@@ -41,8 +41,6 @@ class Server:
             self.log.info("Caught SIGTERM")
             self._remote_stop_event.send(None)
 
-        # Process(target=_signal_stopper, args=(self.log, self._remote_stop_event), daemon=True).start()
-
         signal(SIGTERM, on_sigterm)
 
     def run(self):
@@ -123,7 +121,7 @@ class Server:
     def set_webhook(self):
         heroku_link = os.getenv("HEROKU_LINK")
         if heroku_link:
-            heroku_link += "api/ping"
+            heroku_link += "api/webhook"
             self.tg_api.set_webhook(url=heroku_link)._block_complete()
             self.webhook_log.info("Set")
 
