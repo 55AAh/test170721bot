@@ -32,8 +32,8 @@ class TelegramApiRequest:
                 return result
             elif error_code == 409:
                 self._api.log.warning(f"Webhook was not cleared before getUpdates")
-                yield from self._api.clear_webhook()
-                return self(*args)
+                yield from self._api.clear_webhook()()
+                return (yield from self(*args))
         assert response_json["ok"], f"Bad response: {response_json}"
         result = response_json["result"]
         return result
