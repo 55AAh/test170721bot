@@ -69,8 +69,8 @@ class TelegramApi:
     def __init__(self, bot_token, request_class=TelegramApiRequest):
         self._bot_token = bot_token
         self._request_class = request_class
+        self._send_flood_controller = None
         self.log = Logger.get_logger("TG_API")
-        self._send_flood_controller = _SendFloodController()
 
     def get_updates(self, offset=None, timeout=None):
         return self._request_class(self, "getUpdates", params={"offset": offset, "timeout": timeout})

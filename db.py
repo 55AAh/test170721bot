@@ -44,6 +44,14 @@ class Db:
             return self.db_cur.fetchmany()
 
     @property
+    def last_update_id(self):
+        return self.fetch_one("SELECT last_update_id FROM info")[0]
+
+    @last_update_id.setter
+    def last_update_id(self, value):
+        self.execute("UPDATE info SET last_update_id = %s", value)
+
+    @property
     def current_promise(self):
         return self.fetch_one("SELECT current_promise FROM info")[0]
 
@@ -52,12 +60,12 @@ class Db:
         self.execute("UPDATE info SET current_promise = %s", value)
 
     @property
-    def last_update_id(self):
-        return self.fetch_one("SELECT last_update_id FROM info")[0]
+    def send_flood_controller(self):
+        return self.fetch_one("SELECT send_flood_controller FROM info")[0]
 
-    @last_update_id.setter
-    def last_update_id(self, value):
-        self.execute("UPDATE info SET last_update_id = %s", value)
+    @send_flood_controller.setter
+    def send_flood_controller(self, value):
+        self.execute("UPDATE info SET send_flood_controller = %s", value)
 
     def save_update(self, update):
         self.execute("INSERT INTO updates VALUES (now(), %s)", json.dumps(update))

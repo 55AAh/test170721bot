@@ -54,8 +54,9 @@ class Server:
         self.poller.start(self.tg_api, timeout=90)
 
         self.log.info("Loading state from db...")
-        self.bot.current_promise = pickle.loads(self.db.current_promise)
         self.last_update_id = self.db.last_update_id
+        self.bot.current_promise = pickle.loads(self.db.current_promise)
+        self.bot.tg_api._send_flood_controller = pickle.loads(self.db.send_flood_controller)
         self.log.info("State loaded")
 
         tg_update = self.handle_tg_updates()
@@ -75,8 +76,9 @@ class Server:
         self.webserver.join()
 
         self.log.info("Saving state to db...")
-        self.db.current_promise = pickle.dumps(self.bot.current_promise)
         self.db.last_update_id = self.last_update_id
+        self.db.current_promise = pickle.dumps(self.bot.current_promise)
+        self.db.send_flood_controller = pickle.dumps(self.bot.tg_api._send_flood_controller)
         self.db.disconnect()
         self.log.info("State saved")
 
