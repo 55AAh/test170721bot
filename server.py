@@ -96,10 +96,8 @@ class Server:
             while pipe.poll():
                 update = pipe.recv()
                 if update:
-                    print("BEGIN UPDATE")
                     self.last_update_id = update["update_id"]
                     yield from self.bot._handle_tg_update(update)
-                    print("END UPDATE")
                     yield "End update"
                 else:
                     pipe.send(self.last_update_id)
