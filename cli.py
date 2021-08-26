@@ -11,7 +11,7 @@ def do_request(host, command, retry=False, wait_ok=False):
             response = requests.get(urljoin(host, f"/api/{command}"), timeout=5)
             if not wait_ok or response.json()['ok']:
                 return response.status_code, response.json()
-        except requests.ConnectionError or requests.Timeout as e:
+        except (requests.ConnectionError, requests.Timeout) as e:
             if not retry:
                 print(f"CLI: ERROR:", e)
                 return None
